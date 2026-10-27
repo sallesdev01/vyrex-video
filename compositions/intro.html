@@ -1,0 +1,256 @@
+<!doctype html>
+<!--
+  Abertura: as duas lâminas 3D do símbolo VYREX chegam de lados opostos e se encontram no vértice,
+  o nome entra à direita e a câmera mergulha no vértice até um íris lima fechar o quadro.
+  Seek-safe: tudo é render(t), puxado por um relógio GSAP linear (mesmo padrão do bloco extruded-logo).
+-->
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>VYREX — abertura</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Unbounded";
+        src: url("assets/fonts/unbounded-800.woff2") format("woff2");
+        font-weight: 800;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0a0a0a;
+      }
+      #in-root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0a0a0a;
+      }
+      #in-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(760px 520px at 50% 52%, rgba(198, 255, 26, 0.22), transparent 70%);
+        opacity: 0;
+      }
+      #in-streak {
+        position: absolute;
+        left: 0;
+        top: 534px;
+        width: 1920px;
+        height: 6px;
+        background: linear-gradient(90deg, transparent, #c6ff1a 38%, #f5f5f0 50%, #c6ff1a 62%, transparent);
+        filter: blur(1.5px);
+      }
+      #in-canvas {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        display: block;
+      }
+      #in-word {
+        position: absolute;
+        left: 830px;
+        top: 456px;
+        font-family: "Unbounded";
+        font-weight: 800;
+        font-size: 170px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: #f5f5f0;
+      }
+      #in-iris {
+        position: absolute;
+        inset: 0;
+        background: #c6ff1a;
+        clip-path: circle(0px at 50% 50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-29aj"
+      id="in-root"
+      data-composition-id="intro"
+      data-start="0"
+      data-duration="2.6"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div data-hf-id="hf-hqui" id="in-glow"></div>
+      <div data-hf-id="hf-p82f" id="in-streak"></div>
+      <canvas data-hf-id="hf-c0cc" id="in-canvas" class="clip" data-start="0" data-duration="2.6" data-track-index="1"></canvas>
+      <div data-hf-id="hf-fgub" id="in-word">VYREX</div>
+      <div data-hf-id="hf-z20k" id="in-iris"></div>
+    </div>
+
+    <script>
+      (function () {
+        var root = document.getElementById("in-root");
+        var duration = Math.max(0.001, parseFloat(root.dataset.duration) || 2.6);
+        var clock = { t: 0 };
+        var scene = { duration: duration, clock: clock, render: null };
+        window.__vyrexIntro = scene;
+        window.__hf = window.__hf || {};
+        window.__hf.buildReady = window.__hf.buildReady || {};
+        window.__hf.buildReady["intro"] = new Promise(function (resolve) {
+          scene.ready = resolve;
+        });
+
+        var tl = gsap.timeline({ paused: true });
+        tl.to(clock, {
+          t: duration,
+          duration: duration,
+          ease: "none",
+          onUpdate: function () {
+            if (scene.render) scene.render(clock.t);
+          },
+        });
+        // O traço de luz cruza o quadro no frame 0 e se apaga quando as lâminas chegam.
+        tl.fromTo("#in-streak", { scaleX: 0.55, opacity: 1 }, { scaleX: 1.2, opacity: 0, duration: 0.7, ease: "power2.out" }, 0);
+        tl.fromTo("#in-glow", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.9);
+        tl.fromTo(
+          "#in-word",
+          { clipPath: "inset(0% 100% 0% 0%)", filter: "blur(6px)" },
+          { clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", duration: 0.5, ease: "expo.out" },
+          1.3,
+        );
+        tl.to("#in-word", { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power3.in" }, 2.15);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["intro"] = tl;
+      })();
+    </script>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.184.0/+esm";
+
+      const host = window.__vyrexIntro;
+      const iris = document.getElementById("in-iris");
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById("in-canvas"),
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true,
+      });
+      renderer.setPixelRatio(1);
+      renderer.setSize(1920, 1080, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NeutralToneMapping;
+
+      const scene = new THREE.Scene();
+
+      // Estúdio: faixas claras sobre preto para o metal mostrar reflexos, e uma faixa lima de recorte.
+      const studio = new THREE.Scene();
+      studio.background = new THREE.Color(0x050505);
+      const softbox = (w, h, x, y, z, color, power) => {
+        const panel = new THREE.Mesh(
+          new THREE.PlaneGeometry(w, h),
+          new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(power), side: THREE.DoubleSide }),
+        );
+        panel.position.set(x, y, z);
+        panel.lookAt(0, 0, 0);
+        studio.add(panel);
+      };
+      softbox(10, 2, 0, 7, 2, 0xffffff, 2.6);
+      softbox(1.2, 7, -7, 1, 3, 0xffffff, 2);
+      softbox(1.2, 7, 7, 0, 2, 0xffffff, 1.4);
+      softbox(9, 1.4, 0, 0.5, -7, 0xc6ff1a, 1.6);
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(studio, 0.02).texture;
+
+      const camera = new THREE.PerspectiveCamera(30, 1920 / 1080, 0.1, 100);
+      scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 1.6));
+      const key = new THREE.DirectionalLight(0xffffff, 1.6);
+      key.position.set(-5, 5, 7);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0xc6ff1a, 4);
+      rim.position.set(2, 3, -6);
+      scene.add(rim);
+
+      // Geometria exata do logo (viewBox 120x100), convertida para unidades 3D centradas.
+      const toShape = (pts) => {
+        const s = new THREE.Shape();
+        pts.forEach(([x, y], i) => {
+          const X = (x - 60) / 40;
+          const Y = (47.5 - y) / 40;
+          if (i === 0) s.moveTo(X, Y);
+          else s.lineTo(X, Y);
+        });
+        s.closePath();
+        return s;
+      };
+      const extrude = { depth: 0.5, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.045, bevelSegments: 4 };
+      const geoL = new THREE.ExtrudeGeometry(toShape([[0, 0], [32, 0], [49.65, 41.7], [40.25, 95]]), extrude);
+      const geoR = new THREE.ExtrudeGeometry(toShape([[120, 0], [88, 0], [55.65, 41.7], [46.25, 95]]), extrude);
+      geoL.translate(0, 0, -0.25);
+      geoR.translate(0, 0, -0.25);
+      const matL = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.15, roughness: 0.4, envMapIntensity: 1.3 });
+      const matR = new THREE.MeshStandardMaterial({
+        color: 0xc6ff1a,
+        emissive: 0xc6ff1a,
+        emissiveIntensity: 0.25,
+        metalness: 0.4,
+        roughness: 0.32,
+      });
+      const bladeL = new THREE.Mesh(geoL, matL);
+      const bladeR = new THREE.Mesh(geoR, matR);
+      const symbol = new THREE.Group();
+      symbol.add(bladeL, bladeR);
+      scene.add(symbol);
+      // Vértice do V (ponto de encontro das lâminas), em coordenadas locais do símbolo.
+      const vertexLocal = new THREE.Vector3((43.25 - 60) / 40, (47.5 - 95) / 40, 0);
+
+      const clamp01 = (x) => Math.min(1, Math.max(0, x));
+      const expoOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp01(x)));
+      const inOut = (x) => {
+        const u = clamp01(x);
+        return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+      };
+      const easeIn3 = (x) => Math.pow(clamp01(x), 3);
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const v = new THREE.Vector3();
+
+      host.render = (t) => {
+        // 0 a 0,95 s: cada lâmina chega do seu lado, girando até travar no lugar.
+        const kl = expoOut(t / 0.95);
+        const kr = expoOut((t - 0.08) / 0.95);
+        bladeL.position.set(lerp(-3.4, 0, kl), lerp(2.2, 0, kl), lerp(2.5, 0, kl));
+        bladeL.rotation.set(lerp(0.5, 0, kl), lerp(1.3, 0, kl), lerp(-0.5, 0, kl));
+        bladeR.position.set(lerp(3.4, 0, kr), lerp(2.2, 0, kr), lerp(2.5, 0, kr));
+        bladeR.rotation.set(lerp(0.5, 0, kr), lerp(-1.3, 0, kr), lerp(0.5, 0, kr));
+        // O encaixe acende a lâmina lima por um instante.
+        const flash = clamp01(1 - Math.abs(t - 1.0) / 0.35);
+        matR.emissiveIntensity = 0.25 + 0.55 * flash;
+
+        // 1,15 a 1,75 s: o símbolo diminui e vai para a esquerda para o nome entrar.
+        const m = inOut((t - 1.15) / 0.6);
+        symbol.scale.setScalar(lerp(1, 0.66, m));
+        symbol.position.x = lerp(0, -1.98, m);
+        symbol.rotation.y = lerp(-0.18, 0.12, clamp01(t / host.duration));
+
+        // 2,15 a 2,6 s: a câmera mergulha no vértice.
+        const dive = easeIn3((t - 2.15) / 0.45);
+        v.copy(vertexLocal).multiplyScalar(symbol.scale.x).add(symbol.position);
+        camera.position.set(lerp(0, v.x, dive), lerp(0, v.y, dive), lerp(12, 2.2, dive));
+        camera.lookAt(lerp(0, v.x, dive), lerp(0, v.y, dive), 0);
+        camera.updateMatrixWorld();
+
+        // O íris lima abre a partir do vértice projetado na tela.
+        const p = v.clone().project(camera);
+        const sx = (p.x * 0.5 + 0.5) * 1920;
+        const sy = (-p.y * 0.5 + 0.5) * 1080;
+        const r = easeIn3((t - 2.28) / 0.3) * 2300;
+        iris.style.clipPath = `circle(${r.toFixed(1)}px at ${sx.toFixed(1)}px ${sy.toFixed(1)}px)`;
+
+        renderer.render(scene, camera);
+      };
+      host.render(host.clock.t);
+      host.ready();
+    </script>
+  </body>
+</html>

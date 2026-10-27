@@ -1,0 +1,361 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Unbounded";
+      src: url("assets/fonts/unbounded-800.woff2") format("woff2");
+      font-weight: 800;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: "Inter", sans-serif;
+    }
+    #ph-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(620px 560px at 50% 58%, rgba(198, 255, 26, 0.2), transparent 72%);
+    }
+    #ph-camera {
+      position: absolute;
+      inset: 0;
+    }
+    .ph-card {
+      position: absolute;
+      width: 400px;
+      border-radius: 14px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55);
+    }
+    #ph-card-1 {
+      left: 130px;
+      top: 150px;
+    }
+    #ph-card-2 {
+      left: 190px;
+      top: 650px;
+    }
+    #ph-card-3 {
+      left: 1390px;
+      top: 190px;
+    }
+    #ph-card-4 {
+      left: 1330px;
+      top: 680px;
+    }
+    #ph-phone {
+      position: absolute;
+      left: 743px;
+      top: 70px;
+      width: 434px;
+      height: 940px;
+      padding: 8px;
+      border-radius: 64px;
+      background: linear-gradient(145deg, #3a3d42, #151618 45%, #070708);
+      box-shadow:
+        0 50px 110px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    }
+    #ph-screen {
+      position: relative;
+      width: 418px;
+      height: 924px;
+      overflow: hidden;
+      border-radius: 56px;
+      background: #0a0a0a;
+    }
+    #ph-site {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 418px;
+      height: auto;
+    }
+    #ph-island {
+      position: absolute;
+      left: 50%;
+      top: 22px;
+      width: 120px;
+      height: 34px;
+      margin-left: -60px;
+      border-radius: 20px;
+      background: #000;
+      z-index: 5;
+    }
+    #ph-load {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 418px;
+      height: 4px;
+      background: #c6ff1a;
+      transform-origin: left center;
+      z-index: 4;
+    }
+    #ph-press {
+      position: absolute;
+      left: 48px;
+      top: 609px;
+      width: 322px;
+      height: 47px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.22);
+      opacity: 0;
+    }
+    /* Conversa que o botão abre: a mensagem é a que o site realmente envia. */
+    #ph-chat {
+      position: absolute;
+      inset: 0;
+      background: #0d0d0d;
+      clip-path: circle(0px at 209px 632px);
+    }
+    #ph-chat-head {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 120px;
+      padding: 62px 24px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #161616;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    #ph-chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #c6ff1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #ph-chat-name {
+      font-family: "Unbounded";
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      color: #f5f5f0;
+    }
+    #ph-chat-status {
+      font-size: 13px;
+      color: #9b9b95;
+    }
+    #ph-bubble {
+      position: absolute;
+      right: 18px;
+      top: 470px;
+      width: 300px;
+      padding: 14px 16px 10px;
+      border-radius: 18px 18px 4px 18px;
+      background: #c6ff1a;
+      color: #0a0a0a;
+      font-size: 20px;
+      line-height: 1.35;
+      transform-origin: 100% 100%;
+    }
+    #ph-meta {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 13px;
+      color: #2e2e2b;
+    }
+    #ph-ticks {
+      position: relative;
+      width: 22px;
+      height: 14px;
+    }
+    #ph-ticks svg {
+      position: absolute;
+      inset: 0;
+    }
+    #ph-typing {
+      position: absolute;
+      left: 18px;
+      top: 640px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 7px;
+      border-radius: 18px 18px 18px 4px;
+      background: #1f1f1f;
+    }
+    .ph-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #9b9b95;
+    }
+    #ph-input {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 30px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #ph-input-field {
+      flex: 1;
+      height: 54px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      border-radius: 27px;
+      background: #1f1f1f;
+      font-size: 17px;
+      color: #6b6b66;
+    }
+    #ph-input-send {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #c6ff1a;
+    }
+    #ph-cursor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      z-index: 20;
+    }
+    #ph-flash {
+      position: absolute;
+      inset: 0;
+      background: #c6ff1a;
+    }
+  </style>
+  <div data-hf-id="hf-ypkp" id="root" data-composition-id="phone" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-jh81" id="ph-glow"></div>
+    <div data-hf-id="hf-l8jz" id="ph-camera">
+      <img data-hf-id="hf-8hlx" id="ph-card-1" class="ph-card" src="assets/card-design.png" alt="" />
+      <img data-hf-id="hf-87ty" id="ph-card-2" class="ph-card" src="assets/card-roi.png" alt="" />
+      <img data-hf-id="hf-3y1o" id="ph-card-3" class="ph-card" src="assets/card-2s.png" alt="" />
+      <img data-hf-id="hf-drvl" id="ph-card-4" class="ph-card" src="assets/card-seo.png" alt="" />
+      <div data-hf-id="hf-dj9u" id="ph-phone">
+        <div data-hf-id="hf-8nbi" id="ph-screen">
+          <img data-hf-id="hf-5by6" id="ph-site" src="assets/site-mobile.png" alt="Site da VYREX no celular" />
+          <div data-hf-id="hf-pqru" id="ph-load"></div>
+          <div data-hf-id="hf-osen" id="ph-press"></div>
+          <div data-hf-id="hf-bklk" id="ph-chat">
+            <div data-hf-id="hf-vy8n" id="ph-chat-head">
+              <div data-hf-id="hf-pnwq" id="ph-chat-avatar">
+                <svg data-hf-id="hf-9bln" viewBox="0 0 120 100" width="24" height="20" aria-hidden="true">
+                  <polygon data-hf-id="hf-344g" points="0,0 32,0 49.65,41.7 40.25,95" fill="#0A0A0A" />
+                  <polygon data-hf-id="hf-4gu3" points="120,0 88,0 55.65,41.7 46.25,95" fill="#0A0A0A" fill-opacity="0.55" />
+                </svg>
+              </div>
+              <div data-hf-id="hf-yeow">
+                <div data-hf-id="hf-2lkg" id="ph-chat-name">VYREX</div>
+                <div data-hf-id="hf-fxd0" id="ph-chat-status">online</div>
+              </div>
+            </div>
+            <div data-hf-id="hf-fcwd" id="ph-bubble">
+              Olá! Tenho interesse no plano Landing Page da VYREX.
+              <div data-hf-id="hf-4crz" id="ph-meta">
+                agora
+                <span data-hf-id="hf-8h9j" id="ph-ticks">
+                  <svg data-hf-id="hf-3eo7" viewBox="0 0 22 14" aria-hidden="true">
+                    <path data-hf-id="hf-dpg6" id="ph-tick-a" d="M1 7.5l3.5 3.5L11 4" fill="none" stroke="#2E2E2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path data-hf-id="hf-3ep8" id="ph-tick-b" d="M8 11l1 0L16 4" fill="none" stroke="#2E2E2B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+            <div data-hf-id="hf-7wab" id="ph-typing">
+              <span data-hf-id="hf-o16n" class="ph-dot"></span><span data-hf-id="hf-s8an" class="ph-dot"></span><span data-hf-id="hf-rtzm" class="ph-dot"></span>
+            </div>
+            <div data-hf-id="hf-nsgm" id="ph-input">
+              <div data-hf-id="hf-mv2a" id="ph-input-field">Mensagem</div>
+              <div data-hf-id="hf-1a79" id="ph-input-send"></div>
+            </div>
+          </div>
+        </div>
+        <div data-hf-id="hf-wdmx" id="ph-island"></div>
+      </div>
+      <svg data-hf-id="hf-12gl" id="ph-cursor" viewBox="0 0 32 32" aria-hidden="true">
+        <path data-hf-id="hf-e148" d="M6 3l19 12.5-8.2 1.6 4.6 9.2-3.6 1.8-4.6-9.2L6 24z" fill="#F5F5F0" stroke="#0A0A0A" stroke-width="1.6" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <div data-hf-id="hf-x8gk" id="ph-flash"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // Escala da tela: o print tem 430 px de largura CSS (em 2x) e a tela tem 418 px.
+    const K = 418 / 430;
+    // Topo do trecho de preços no print, em px CSS: a rolagem para aqui.
+    const SCROLL_TO = 5750;
+
+    // O lima do íris da abertura se recolhe no brilho.
+    tl.fromTo("#ph-flash", { opacity: 1 }, { opacity: 0, duration: 0.45, ease: "power2.out" }, 0);
+
+    // O celular sobe com o site real na tela.
+    tl.fromTo("#ph-phone", { y: 620, scale: 0.9 }, { y: 0, scale: 1, duration: 1.0, ease: "expo.out" }, 0.05);
+    tl.fromTo("#ph-load", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 0.9);
+    tl.to("#ph-load", { opacity: 0, duration: 0.2, ease: "power2.in" }, 1.45);
+
+    // Cards reais do site se abrem em profundidade a partir do celular.
+    const cards = [
+      ["#ph-card-1", 830, 390, 0.86],
+      ["#ph-card-2", 770, -110, 0.74],
+      ["#ph-card-3", -630, 350, 0.8],
+      ["#ph-card-4", -570, -140, 0.9],
+    ];
+    cards.forEach(([sel, dx, dy, s], i) => {
+      tl.fromTo(
+        sel,
+        { x: dx, y: dy, scale: 0.4, opacity: 0, filter: "blur(10px)" },
+        { x: 0, y: 0, scale: s, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" },
+        0.65 + i * 0.08,
+      );
+    });
+
+    // A página rola até o plano Landing Page; os cards andam no sentido contrário (paralaxe).
+    tl.fromTo("#ph-site", { y: 0 }, { y: -SCROLL_TO * K, duration: 1.4, ease: "power2.inOut" }, 2.0);
+    tl.to(["#ph-card-1", "#ph-card-3"], { y: 40, duration: 1.4, ease: "power2.inOut" }, 2.0);
+    tl.to(["#ph-card-2", "#ph-card-4"], { y: 70, duration: 1.4, ease: "power2.inOut" }, 2.0);
+
+    // Os cards saem para fora do quadro e a câmera aproxima no botão.
+    tl.to(["#ph-card-1", "#ph-card-2"], { x: -700, opacity: 0, filter: "blur(12px)", duration: 0.45, ease: "power3.in" }, 3.35);
+    tl.to(["#ph-card-3", "#ph-card-4"], { x: 700, opacity: 0, filter: "blur(12px)", duration: 0.45, ease: "power3.in" }, 3.35);
+    tl.to("#ph-camera", { scale: 1.7, y: -284, duration: 0.6, ease: "power2.inOut", transformOrigin: "50% 50%" }, 3.45);
+
+    // O cursor entra pela direita e clica no botão "Quero minha landing page".
+    tl.fromTo("#ph-cursor", { x: 1500, y: 980, opacity: 0 }, { x: 958, y: 703, opacity: 1, duration: 0.6, ease: "expo.out" }, 4.0);
+    tl.to("#ph-cursor", { scale: 0.85, duration: 0.08, ease: "power2.in", transformOrigin: "10% 10%" }, 4.7);
+    tl.to("#ph-cursor", { scale: 1, duration: 0.12, ease: "power2.out", transformOrigin: "10% 10%" }, 4.78);
+    tl.fromTo("#ph-press", { opacity: 0 }, { opacity: 1, duration: 0.06 }, 4.7);
+    tl.to("#ph-press", { opacity: 0, duration: 0.12 }, 4.82);
+
+    // O clique abre a conversa a partir do próprio botão.
+    tl.fromTo(
+      "#ph-chat",
+      { clipPath: "circle(0px at 209px 632px)" },
+      { clipPath: "circle(1100px at 209px 632px)", duration: 0.4, ease: "power3.in" },
+      4.82,
+    );
+    tl.to("#ph-cursor", { opacity: 0, duration: 0.15, ease: "power2.out" }, 4.95);
+    tl.to("#ph-camera", { scale: 1.35, y: -132, duration: 0.6, ease: "power2.inOut" }, 5.0);
+
+    // A mensagem é enviada, entregue e lida.
+    tl.fromTo("#ph-bubble", { scale: 0.6, opacity: 0, y: 40 }, { scale: 1, opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, 5.3);
+    tl.fromTo("#ph-tick-b", { opacity: 0 }, { opacity: 1, duration: 0.1 }, 5.85);
+    tl.to(["#ph-tick-a", "#ph-tick-b"], { stroke: "#0A0A0A", duration: 0.15 }, 6.15);
+    tl.fromTo("#ph-typing", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.4)", transformOrigin: "0% 100%" }, 6.25);
+    // Três pontinhos digitando, em ondas finitas.
+    document.querySelectorAll(".ph-dot").forEach((dot, i) => {
+      tl.fromTo(dot, { y: 0 }, { y: -6, duration: 0.18, ease: "sine.inOut", yoyo: true, repeat: 1 }, 6.4 + i * 0.1);
+    });
+
+    // Mergulho para dentro da tela: leva ao mundo 3D.
+    tl.to("#ph-camera", { scale: 7, y: -600, filter: "blur(14px)", opacity: 0, duration: 0.55, ease: "power4.in" }, 6.82);
+    tl.to("#ph-glow", { opacity: 0, duration: 0.4, ease: "power2.in" }, 6.95);
+    window.__timelines["phone"] = tl;
+  </script>
+</template>
